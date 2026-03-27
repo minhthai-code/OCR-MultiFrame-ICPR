@@ -55,16 +55,19 @@ class MultiFrameDataset(Dataset):
             full_train: If True, use all tracks for training (no val split).
         """
 
-        # so if we call it like this
+        # in train.py we call it like this
         # train_ds = MultiFrameDataset(
         #         root_dir=config.DATA_ROOT,
         #         mode='train',
         #         full_train=True, # full_train=True tells the dataset class to skip the train/val split
         #         **common_ds_params
         #     )
+        # then: 
+        # self.mode = mode means train_ds.mode = 'train'
+        # self.img_height = img_height means train_ds.img_height = 32
 
         self.mode = mode
-        self.samples: List[Dict[str, Any]] = []
+        self.samples: List[Dict[str, Any]] = [] # 
         self.img_height = img_height
         self.img_width = img_width
         self.char2idx = char2idx or {}
@@ -73,7 +76,8 @@ class MultiFrameDataset(Dataset):
         self.augmentation_level = augmentation_level
         self.is_test = is_test
         self.full_train = full_train
-        
+
+        """Augementaion handing: """       
         if mode == 'train':
             # Training: apply augmentation on the fly
             if augmentation_level == "light":
@@ -87,12 +91,14 @@ class MultiFrameDataset(Dataset):
             self.degrade = None
 
         print(f"[{mode.upper()}] Scanning: {root_dir}")
-        abs_root = os.path.abspath(root_dir)
-        search_path = os.path.join(abs_root, "**", "track_*")
-        all_tracks = sorted(glob.glob(search_path, recursive=True))
+
+        """Data loading and splitting logic:"""
+        abs_root = os.path.abspath(root_dir) # Convert a relative path into an absolute path. if root_dir is /data, abs_root will be /home/user/project/data
+        search_path = os.path.join(abs_root, "**", "track_*") # /home/user/project/data/**/track_*
+        all_tracks = sorted(glob.glob(search_path, recursive=True)) # Find files or folders that match a pattern. the patter is /home/user/project/data/**/track_*
         
         if not all_tracks:
-            print("❌ ERROR: No data found.")
+            print(f"ERROR: No data found in '{root_dir}' with pattern '{search_path}'. Please check your data path.")
             return
 
         # Handle test mode differently
