@@ -25,6 +25,7 @@ class MultiFrameDataset(Dataset):
     Implements Scenario-B specific validation splitting logic.
     """
     
+    # parameters control how the dataset behaves. we initialize the dataset with these parameters
     def __init__(
         self,
         root_dir: str,
@@ -46,13 +47,22 @@ class MultiFrameDataset(Dataset):
             split_ratio: Train/val split ratio.
             img_height: Target image height.
             img_width: Target image width.
-            char2idx: Character to index mapping.
+            char2idx: Character to index mapping converts characters into numbers because neural networks cannot process text directly.
             val_split_file: Path to validation split JSON file.
             seed: Random seed for reproducible splitting.
             augmentation_level: 'full' or 'light' augmentation for training.
             is_test: If True, load test data without labels (for submission).
             full_train: If True, use all tracks for training (no val split).
         """
+
+        # so if we call it like this
+        # train_ds = MultiFrameDataset(
+        #         root_dir=config.DATA_ROOT,
+        #         mode='train',
+        #         full_train=True, # full_train=True tells the dataset class to skip the train/val split
+        #         **common_ds_params
+        #     )
+
         self.mode = mode
         self.samples: List[Dict[str, Any]] = []
         self.img_height = img_height
