@@ -3,7 +3,7 @@
 """
     It orchestrates the entire training pipeline, including:
         CLI arguments
-        ↓
+            ↓
         Load Config
             ↓
         Create Dataset
@@ -172,6 +172,9 @@ def main():
     config.OUTPUT_DIR = args.output_dir
     os.makedirs(config.OUTPUT_DIR, exist_ok=True)
     
+    """
+        TODO: Explain Tín
+    """
     seed_everything(config.SEED)
     
     # print the final configuration after applying CLI overrides
