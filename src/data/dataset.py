@@ -96,24 +96,25 @@ class MultiFrameDataset(Dataset):
         abs_root = os.path.abspath(root_dir) # Convert a relative path into an absolute path. if root_dir is /data, abs_root will be /home/user/project/data
         search_path = os.path.join(abs_root, "**", "track_*") # /home/user/project/data/**/track_*
         all_tracks = sorted(glob.glob(search_path, recursive=True)) # Find files or folders that match a pattern. the patter is /home/user/project/data/**/track_*
-        
-        if not all_tracks:
+        # all_tracks = ['/home/user/project/data/Scenario-A/track_001', '/home/user/project/data/Scenario-B/track_002', ...]
+
+        if not all_tracks: # if the list is empty or all_tracks = []
             print(f"ERROR: No data found in '{root_dir}' with pattern '{search_path}'. Please check your data path.")
             return
 
         # Handle test mode differently
-        if is_test:
-            print(f"[TEST] Loaded {len(all_tracks)} tracks.")
-            self._index_test_samples(all_tracks)
-            print(f"-> Total: {len(self.samples)} test samples.")
-        else:
+        if is_test: # if we are in test mode, we load all tracks and index them without labels
+            print(f"[TEST] Loaded {len(all_tracks)} tracks.") # print the number of tracks loaded in test mode
+            self._index_test_samples(all_tracks) # index the test samples without labels, we only care about the paths and track ids for test data
+            print(f"TOTAL: {len(self.samples)} test samples.")
+        else: # else, we are in train or val mode, we need to split the data first
             train_tracks, val_tracks = self._load_or_create_split(all_tracks, split_ratio)
             
             selected_tracks = train_tracks if mode == 'train' else val_tracks
             print(f"[{mode.upper()}] Loaded {len(selected_tracks)} tracks.")
             
             self._index_samples(selected_tracks)
-            print(f"-> Total: {len(self.samples)} samples.")
+            print(f"-> TOTAL: {len(self.samples)} samples.")
 
     def _load_or_create_split(
         self,
@@ -225,16 +226,17 @@ class MultiFrameDataset(Dataset):
 
     def _index_test_samples(self, tracks: List[str]) -> None:
         """Index test samples without labels."""
-        for track_path in tqdm(tracks, desc="Indexing test"):
+        for track_path in tqdm(tracks, desc="Indexing test"): # show the progress of indexing test samples
             track_id = os.path.basename(track_path)
             
-            # Load all LR images (sorted by frame number)
-            lr_files = sorted(
-                glob.glob(os.path.join(track_path, "lr-*.png")) +
-                glob.glob(os.path.join(track_path, "lr-*.jpg"))
-            )
+            # Load all LR images (sorted by frame number) 
+            # track_001/
+            # lr-1.png
+            # lr-2.png
+            # lr-3.png
+            lr_files = sorted(glob.glob(os.path.join(track_path, "lr-*.png")) + glob.glob(os.path.join(track_path, "lr-*.jpg"))) # we only care about the LR files for test data, we ignore the HR files because they are not used in test mode
             
-            if lr_files:
+            if lr_files: # if there are LR files, we add them to the samples list with dummy label and is_synthetic=False because we don't apply degradation in test mode
                 self.samples.append({
                     'paths': lr_files,
                     'label': '',  # No label for test data
