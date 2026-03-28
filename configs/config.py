@@ -25,8 +25,36 @@ class Config:
     
     # Character set
     CHARS: str = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ"
-    
-    # Training hyperparameters
+    #    # Training hyperparameters
+    """
+    BATCH_SIZE (64)
+    Number of samples processed before updating model weights.
+    Example: If your dataset has 6400 images and batch size is 64 → 100 steps per epoch.
+    Larger batch → more stable gradients but uses more GPU memory.
+    Smaller batch → more updates per epoch, noisier gradient but less memory.
+    LEARNING_RATE (5e-4)
+    Determines how big the weight updates are during training.
+    Too high → model may diverge, too low → slow training.
+    Example: 5e-4 = 0.0005 (a common starting point for Adam optimizer).
+    EPOCHS (30)
+    Number of times the entire training dataset is passed through the model.
+    SEED (42)
+    Fixes random number generators to reproduce results.
+    NUM_WORKERS (10)
+    Number of parallel CPU threads used to load data.
+    More workers → faster data loading, but uses more CPU.
+    Too many workers → can slow down due to context switching.
+    WEIGHT_DECAY (1e-4)
+    Regularization parameter to prevent overfitting.
+    Adds a small penalty to large weights (like L2 regularization).
+    GRAD_CLIP (5.0)
+    Gradient clipping to prevent exploding gradients.
+    Any gradient larger than 5 is scaled down.
+    SPLIT_RATIO (0.9)
+    Fraction of the training dataset used as actual training (0.9 = 90%), rest for validation.
+    USE_CUDNN_BENCHMARK
+    When True, cuDNN will optimize GPU kernels for your model/input sizes. Can make training faster but non-deterministic.
+    """
     BATCH_SIZE: int = 64
     LEARNING_RATE: float = 5e-4
     EPOCHS: int = 30

@@ -172,6 +172,45 @@ def main():
     config.OUTPUT_DIR = args.output_dir
     os.makedirs(config.OUTPUT_DIR, exist_ok=True)
     
+    """
+    Purpose:
+
+    This function ensures your machine learning experiments are reproducible, meaning you get the same results every time you run your code.
+
+    It sets fixed random seeds for:
+
+    Python (random)
+    NumPy (np)
+    PyTorch (CPU and GPU)
+
+    This makes operations like:
+
+    weight initialization
+    data shuffling
+    random sampling
+
+    behave consistently across runs.
+
+    GPU Behavior (cuDNN Settings)
+
+    The function also controls how CUDA (GPU acceleration) behaves:
+    Deterministic mode (benchmark=False)
+    → Slower but produces exact same results every run
+    Benchmark mode (benchmark=True)
+    → Faster but may produce slightly different results each run
+    
+    Tradeoff:
+    Reproducibility → good for debugging, research
+    Speed → good for training and performance
+
+    You choose depending on your goal.
+
+    Overall Benefit
+    By removing randomness and controlling GPU behavior, this function makes:
+    debugging easier
+    experiments fairer
+    results more reliable
+    """
     seed_everything(config.SEED)
     
     # print the final configuration after applying CLI overrides
